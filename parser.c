@@ -138,7 +138,6 @@ void term() {
 	//factor();
 }
 
-//	THIS NEEDS FURTHER WORK
 void factor() {
 	switch (CurrToken.Id) {
 	case LPAREN:		//'('
@@ -147,8 +146,18 @@ void factor() {
 		match(RPAREN);
 
 		break;
-	case '-':
+	case MINUSOP:
+		match(MINUSOP);
+		factor();
 
+		break;
+	case ID:
+		match(ID)
+			
+		break;
+	case INTLITERAL:
+		match(INTLITERAL);
+			
 		break;
 	default:
 
@@ -156,8 +165,37 @@ void factor() {
 	}
 }
 
-//	PRODUCE THE ADDOP AND MULTOP HERE
+void add_op() {
+	switch(currtoken.id) {
+	case PLUSOP:		
+		match(PLUSOP);
+			
+		break;
+	case MINUSOP:
+		match(MINUSOP);
+	
+		break;
+	default:
+		
+		break;
+	}
+}
 
+void mult_op() {
+	switch(currtoken.id) {
+	case MULTOP:
+		match(MULTOP);
+			
+		break;
+	case DIVOP:
+		match(DIVOP);
+			
+		break;
+	default:
+		
+		break;
+	}
+}
 void condition() {
 	addition();
 	RelOp();
@@ -176,8 +214,90 @@ void multiplication() {
 	//unary();
 }
 
-// void unary()
+void unary() {
+	switch(currtoken.id) {
+	case NOTOP:
+		match(NOTOP);
+		unary();
+			
+		break;
+	case MINUSOP:
+		match(MINUSOP);
+		unary();
+			
+		break;
+	default:
+		lprimary();
+			
+		break;
+	}
+}
 
-// void lprimary()
+void lprimary() {
+	switch(currtoken.id) {
+	case INTLITERAL:
+		match(INTLITERAL);
+			
+		break;
+	case ID:
+		match(ID);
+			
+		break;
+	case LPAREN:
+		match(LPAREN);
+		condition();
+		match(RPAREN);
+			
+		break;
+	case FALSEOP:
+		match(FALSEOP);
+			
+		break;
+	case TRUEOP:
+		match(TRUEOP);
+			
+		break;
+	case NULLOP:
+		match(NULLOP);
+		
+		break;
+	default:
+			
+		break;
+	}
+}
 
-// void RelOp()
+void RelOp() {
+	switch(currtoken.id) {
+	case LESSEQUALOP:
+		match(LESSOP);
+		match(LESSEQUALOP);
+			
+		break;
+	case NOTEQUALOP:
+		match(LESSOP);
+		match(GREATEROP);
+			
+		break;
+	case LESSOP:
+		match(LESSOP);
+			
+		break;
+	case GREATEREQUALOP:
+		match(GREATEROP);
+		match(GREATEREQUALOP);
+			
+		break;
+	case GREATEROP:
+		match(GREATEROP);
+			
+		break;
+	case EQUALOP:
+		match(EQUALOP);
+			
+		break;
+	default:
+		
+		break;
+	}			
+}
