@@ -119,9 +119,17 @@ void IFTail() {
 }
 
 void idList() {
-		match(ID);
+	switch (CurrToken.Id) {
+	case COMMA:
 		match(COMMA);
 		match(ID);
+		
+		break;
+	default:
+		match(ID);
+			
+		break
+	}
 }
 
 void exprList() {
