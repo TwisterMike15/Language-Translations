@@ -24,8 +24,8 @@ void exprList();
 void expression();
 void term();
 void factor();
-void addop();		//do we need this here?
-void multop();		//do we need this here?
+void addOp();		//do we need this here?
+void multOp();		//do we need this here?
 void condition();
 void addition();
 void multiplication();
@@ -47,6 +47,10 @@ void program() {
 }
 
 void statementlist() {
+	logical success = statementlist();
+	while (success) {
+		statementlist();
+	}
 	statement();
 }
 
@@ -121,21 +125,38 @@ void idList() {
 }
 
 void exprList() {
-	expression();
-	match(COMMA);
-	//expression();
+	switch (CurrToken.Id) {
+	case COMMA:
+		match(COMMA);
+			
+		break;
+	default:
+		expression();
+			
+		break;
+	}
 }
 
 void expression() {
-	term();
-	addop();
-	//term();
+	logical success = add_op();
+	if (success) {
+		addop();
+		term();
+	}
+	else {
+		term();
+	}
 }
 
 void term() {
-	factor();
-	multop();
-	//factor();
+	logical successs = multOp();
+	if (success) {
+		multOp();
+		factor();
+	}
+	else {
+		factor();
+	}		
 }
 
 void factor() {
@@ -165,7 +186,7 @@ void factor() {
 	}
 }
 
-void add_op() {
+void addOp() {
 	switch(currtoken.id) {
 	case PLUSOP:		
 		match(PLUSOP);
@@ -181,7 +202,7 @@ void add_op() {
 	}
 }
 
-void mult_op() {
+void multOp() {
 	switch(currtoken.id) {
 	case MULTOP:
 		match(MULTOP);
@@ -197,21 +218,36 @@ void mult_op() {
 	}
 }
 void condition() {
-	addition();
-	RelOp();
-	//addition();
+	logical success = RelOp();
+	if (success) {
+		RelOp();
+		addition();
+	}
+	else {
+		addition();
+	}
 }
 
 void addition() {
-	multiplication();
-	addop();
-	//multiplication();
+	logical success = addOp();
+	if (success) {
+		addOp();
+		multiplication();
+	}
+	else {
+		multiplication();
+	}
 }
 
 void multiplication() {
-	unary();
-	multop();
-	//unary();
+	logical success = multOp();
+	if (success)
+		multOp();
+		unary();
+	}
+	else {
+		unary();
+	}
 }
 
 void unary() {
