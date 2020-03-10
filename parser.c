@@ -157,14 +157,12 @@ void expression() {
 }
 
 void term() {
-	logical successs = multOp();
+	factor();
+	isMultOp();
 	if (success) {
 		multOp();
 		factor();
-	}
-	else {
-		factor();
-	}		
+	}	
 }
 
 void factor() {
@@ -344,4 +342,23 @@ void RelOp() {
 		
 		break;
 	}			
+}
+
+isMultOp {
+	switch(currtoken.id) {
+	case MULTOP:
+		match(MULTOP);
+		success = true;
+			
+		break;
+	case DIVOP:
+		match(DIVOP);
+		success = true;	
+			
+		break;
+	default:
+		success = false;
+			
+		break;
+	}
 }
