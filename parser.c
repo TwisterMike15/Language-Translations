@@ -47,11 +47,12 @@ void program() {
 }
 
 void statementlist() {
+	statement();
 	logical success = statementlist();
 	while (success) {
 		statementlist();
 	}
-	statement();
+	
 }
 
 void statement() {
@@ -90,9 +91,15 @@ void statement() {
 		match(LPAREN);
 		condition();
 		match(RPAREN);
-		statementlist();
-		match(ENDWHILE);
-
+		logical success = statementList();
+			
+		if (success) {
+			statementlist();
+		}
+		else {
+			match(ENDWHILE);
+		}
+			
 		break;
 	default:
 
@@ -119,6 +126,7 @@ void IFTail() {
 }
 
 void idList() {
+	match(ID);
 	switch (CurrToken.Id) {
 	case COMMA:
 		match(COMMA);
@@ -126,32 +134,29 @@ void idList() {
 		
 		break;
 	default:
-		match(ID);
 			
 		break
 	}
 }
 
 void exprList() {
+	expression();
 	switch (CurrToken.Id) {
 	case COMMA:
 		match(COMMA);
 			
 		break;
 	default:
-		expression();
 			
 		break;
 	}
 }
 
 void expression() {
-	logical success = add_op();
+	term();
+	isAddOp();
 	if (success) {
 		addop();
-		term();
-	}
-	else {
 		term();
 	}
 }
@@ -224,34 +229,28 @@ void multOp() {
 	}
 }
 void condition() {
+	addition();
 	logical success = RelOp();
 	if (success) {
 		RelOp();
 		addition();
 	}
-	else {
-		addition();
-	}
 }
 
 void addition() {
-	logical success = addOp();
+	multiplication();
+	isAddOp();
 	if (success) {
 		addOp();
-		multiplication();
-	}
-	else {
 		multiplication();
 	}
 }
 
 void multiplication() {
-	logical success = multOp();
+	unary();
+	isMultOp();
 	if (success)
 		multOp();
-		unary();
-	}
-	else {
 		unary();
 	}
 }
@@ -344,15 +343,32 @@ void RelOp() {
 	}			
 }
 
-isMultOp {
+void isStatementList
+
+void isAddOp {
+	switch(currtoken.id) {
+	case ADDOP:
+		success = true;
+			
+		break;
+	case MINUSOP:
+		success = true;
+			
+		break;
+	default:
+		success = false;
+		
+		break;
+	}
+}
+
+void isMultOp {
 	switch(currtoken.id) {
 	case MULTOP:
-		match(MULTOP);
 		success = true;
 			
 		break;
 	case DIVOP:
-		match(DIVOP);
 		success = true;	
 			
 		break;
