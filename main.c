@@ -12,7 +12,6 @@ Language Translations
 #include "scanner.h"
 
 
-
 file_outcome init(int argc, char* argv[]) {
     file_outcome fileCheck = openFiles(argc, argv);
 
@@ -33,7 +32,7 @@ int main(int argc, char* argv[]) {
 
     if (init(argc, argv) == cont) {
         printf("\nScanning File\n");
-        scanner(InpFile);
+        initScanner(InpFile);
         cleanup();
         printf("Scan Complete\n");
     }

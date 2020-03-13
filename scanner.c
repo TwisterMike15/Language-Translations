@@ -12,12 +12,6 @@ Language Translations
 #include "file_util.h"
 #include "scanner.h"
 
-
-#define LINE_BUFF_SIZE 1024
-#define TOKEN_BUFF_SIZE 1024
-#define OUTFILE_BUFF_SIZE 1024
-#define TOKEN_TYPE_SIZE 20
-
 char LineBuff[LINE_BUFF_SIZE]           = { '\0' };
 char LisFileBuffer[OUTFILE_BUFF_SIZE]   = { '\0' };  //for formatting numbered lines in listing file
 char LexErrBuff[LINE_BUFF_SIZE]         = { '\0' };
@@ -167,7 +161,7 @@ TokenId getReservedId() {
     return foundtoken;
 }
 
-TokenId getNextToken() {
+void getNextToken() {
     memcpy(&CurrToken, &NextToken, sizeof(tokendata)); //Move NextToken into CurrToken
 
 

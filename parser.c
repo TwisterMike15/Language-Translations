@@ -16,22 +16,64 @@ Language Translations
 //Production Prototypes
 void systemgoal();
 void program();
-void statementlist();
+void statementList();
 void statement();
-void IFTail();
+void ifTail();
 void idList();
 void exprList();
 void expression();
 void term();
 void factor();
-void addOp();		//do we need this here?
-void multOp();		//do we need this here?
+void addOp();
+void multOp();
 void condition();
 void addition();
 void multiplication();
 void unary();
 void lprimary();
-void RelOp();
+void relOp();
+
+
+
+//Checks for **optional** productions
+logical isStatementList() {
+	logical success = lfalse;
+	switch (CurrToken.Id) {
+		case ID:
+		case READ:
+		case WRITE:
+		case IF:
+			success = ltrue;
+			break;
+	}
+	return success;
+}
+
+logical isAddOp() {
+	return (CurrToken.Id == PLUSOP || CurrToken.Id == MINUSOP);
+}
+
+logical isMultOp() {
+	return (CurrToken.Id == MULTOP || CurrToken.Id == DIVOP);
+}
+
+logical isRelOp() {
+	logical success = lfalse;
+	switch (CurrToken.Id) {
+		case LESSOP:
+		case LESSEQUALOP:
+		case GREATEROP:
+		case GREATEREQUALOP:
+		case EQUALOP:
+		case NOTEQUALOP:
+			success = ltrue;
+			break;
+	}
+	return success;
+}
+
+
+
 
 
 //Productions
@@ -42,17 +84,14 @@ void systemgoal() {
 
 void program() {
 	match(BEGIN);
-	statementlist();
+	statementList();
 	match(END);
 }
 
-void statementlist() {
-	statement();
-	logical success = statementlist();
-	while (success) {
-		statementlist();
-	}
-	
+void statementList() {
+	do {
+		statement();
+	} while ( isStatementList() );
 }
 
 void statement() {
@@ -82,8 +121,8 @@ void statement() {
 		match(LPAREN);
 		condition();
 		match(THEN);
-		statementlist();
-		IFTail();
+		statementList();
+		ifTail();
 
 		break;
 	case WHILE:
@@ -91,12 +130,10 @@ void statement() {
 		match(LPAREN);
 		condition();
 		match(RPAREN);
-		logical success = statementList();
 			
-		if (success) {
-			statementlist();
-		}
-		else {
+		if (isStatementList()) {
+			statementList();
+		} else {
 			match(ENDWHILE);
 		}
 			
@@ -107,11 +144,11 @@ void statement() {
 	}
 }
 
-void IFTail() {
+void ifTail() {
 	switch (CurrToken.Id) {
 	case ELSE:
 		match(ELSE);
-		statementlist();
+		statementList();
 		match(ENDIF);
 
 		break;
@@ -128,43 +165,38 @@ void IFTail() {
 void idList() {
 	match(ID);
 	switch (CurrToken.Id) {
-	case COMMA:
-		match(COMMA);
-		match(ID);
+		case COMMA:
+			match(COMMA);
+			match(ID);
 		
-		break;
-	default:
+			break;
+		default:
 			
-		break
+			break;
 	}
 }
 
 void exprList() {
 	expression();
-	switch (CurrToken.Id) {
-	case COMMA:
+	
+	while ( CurrToken.Id == COMMA ) {
 		match(COMMA);
-			
-		break;
-	default:
-			
-		break;
+		expression();
 	}
 }
 
 void expression() {
 	term();
-	isAddOp();
-	if (success) {
-		addop();
+	
+	if ( isAddOp() ) {
+		addOp();
 		term();
 	}
 }
 
 void term() {
 	factor();
-	isMultOp();
-	if (success) {
+	if ( isMultOp() ) {
 		multOp();
 		factor();
 	}	
@@ -184,7 +216,7 @@ void factor() {
 
 		break;
 	case ID:
-		match(ID)
+		match(ID);
 			
 		break;
 	case INTLITERAL:
@@ -198,7 +230,7 @@ void factor() {
 }
 
 void addOp() {
-	switch(currtoken.id) {
+	switch(CurrToken.Id) {
 	case PLUSOP:		
 		match(PLUSOP);
 			
@@ -214,7 +246,7 @@ void addOp() {
 }
 
 void multOp() {
-	switch(currtoken.id) {
+	switch(CurrToken.Id) {
 	case MULTOP:
 		match(MULTOP);
 			
@@ -230,17 +262,16 @@ void multOp() {
 }
 void condition() {
 	addition();
-	logical success = RelOp();
-	if (success) {
-		RelOp();
+	if ( isRelOp() ) {
+		relOp();
 		addition();
 	}
 }
 
 void addition() {
 	multiplication();
-	isAddOp();
-	if (success) {
+
+	if ( isAddOp() ) {
 		addOp();
 		multiplication();
 	}
@@ -248,15 +279,15 @@ void addition() {
 
 void multiplication() {
 	unary();
-	isMultOp();
-	if (success)
+	
+	if ( isMultOp() ) {
 		multOp();
 		unary();
 	}
 }
 
 void unary() {
-	switch(currtoken.id) {
+	switch(CurrToken.Id) {
 	case NOTOP:
 		match(NOTOP);
 		unary();
@@ -275,7 +306,7 @@ void unary() {
 }
 
 void lprimary() {
-	switch(currtoken.id) {
+	switch(CurrToken.Id) {
 	case INTLITERAL:
 		match(INTLITERAL);
 			
@@ -308,8 +339,8 @@ void lprimary() {
 	}
 }
 
-void RelOp() {
-	switch(currtoken.id) {
+void relOp() {
+	switch(CurrToken.Id) {
 	case LESSEQUALOP:
 		match(LESSOP);
 		match(LESSEQUALOP);
@@ -343,38 +374,3 @@ void RelOp() {
 	}			
 }
 
-void isStatementList
-
-void isAddOp {
-	switch(currtoken.id) {
-	case ADDOP:
-		success = true;
-			
-		break;
-	case MINUSOP:
-		success = true;
-			
-		break;
-	default:
-		success = false;
-		
-		break;
-	}
-}
-
-void isMultOp {
-	switch(currtoken.id) {
-	case MULTOP:
-		success = true;
-			
-		break;
-	case DIVOP:
-		success = true;	
-			
-		break;
-	default:
-		success = false;
-			
-		break;
-	}
-}
