@@ -1,9 +1,8 @@
-/*Group 2 Program 3
+/*Group 2 Program 2
 Paul Maclean- mac7537@calu.edu
 Mike Gorse- gor9632@calu.edu
 Robert Breckenridge- bre6896@calu.edu
 Chase Smith- smi8808@calu.edu
-Rudolph Hanzes - han7739@calu.edu
 
 CSC 460
 Language Translations
@@ -13,13 +12,7 @@ Language Translations
 #define SCANNER_H
 
 
-//*****************************Constants*****************************//
-#define LINE_BUFF_SIZE 1026
-#define OUTFILE_BUFF_SIZE 2000
-#define TOKEN_BUFF_SIZE 100
-#define TOKEN_TYPE_SIZE 20
-
-static const char* TOKEN_NAMES[34] = {
+static const char* TOKEN_TYPES[33] = {
 	"BEGIN",         //0
 	"END",           //1
 	"READ",          //2
@@ -52,8 +45,7 @@ static const char* TOKEN_NAMES[34] = {
 	"EOF",           //29
 	"ID",            //30
 	"INTLITERAL",    //31
-	"LEXERR",        //32
-	"COMMENT"		 //33
+	"LEXERR"         //32
 };
 
 typedef enum {
@@ -90,29 +82,9 @@ typedef enum {
 	ID,              //30
 	INTLITERAL,      //31
 	LEXERR,          //32
-	COMMENT          //33
 } TokenId;
 
-typedef struct {
-	TokenId Id;
-	char Buff[TOKEN_BUFF_SIZE];  //What was in the input file (">=")
-	char* Name;                  //What name ("GREATEREQUALOP")
-	int BuffIndex;
-} tokendata;
 
-
-
-
-//*****************************Attributes****************************//
-tokendata CurrToken;
-tokendata NextToken;
-
-
-
-//*****************************Methods*******************************//
-logical match(TokenId);
-TokenId peekNextToken();
-void initScanner();
-void printLexErrors();
+void scanner(FILE*);
 
 #endif

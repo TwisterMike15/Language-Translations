@@ -335,3 +335,4 @@ void initScanner()
     getNextToken(); //put first token into NextToken
     getNextToken(); //put first token into CurrToken, and second token into NextToken
 }
+
