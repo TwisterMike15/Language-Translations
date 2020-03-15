@@ -75,7 +75,6 @@ logical isRelOp() {
 
 
 
-
 //Productions
 void systemgoal() {
 	program();
@@ -100,6 +99,7 @@ void statement() {
 		match(ID);
 		match(ASSIGNOP);
 		expression();
+		match(SEMICOLON);
 
 		break;
 	case READ:
@@ -107,6 +107,7 @@ void statement() {
 		match(LPAREN);
 		idList();
 		match(RPAREN);
+		match(SEMICOLON);
 
 		break;
 	case WRITE:
@@ -114,6 +115,7 @@ void statement() {
 		match(LPAREN);
 		exprList();
 		match(RPAREN);
+		match(SEMICOLON);
 
 		break;
 	case IF:
@@ -181,7 +183,7 @@ void exprList() {
 	
 	while ( CurrToken.Id == COMMA ) {
 		match(COMMA);
-		expression();
+		exprList();
 	}
 }
 
@@ -221,7 +223,7 @@ void factor() {
 		break;
 	case INTLITERAL:
 		match(INTLITERAL);
-			
+					
 		break;
 	default:
 
