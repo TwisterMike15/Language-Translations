@@ -300,7 +300,9 @@ void getNextToken() {
     //printf("%s", printBuffer);
 }
 
-
+void parserError(const char *expected) {
+    printf("Line %d: Expected %s, got '%s'\n", LineCount, expected, CurrToken.Buff);
+}
 
 logical match(TokenId desiredid) {
     logical success = lfalse;
@@ -309,7 +311,7 @@ logical match(TokenId desiredid) {
     if (CurrToken.Id == desiredid) {
         success = ltrue;
     } else {
-        printf("Line %d: Expected %s, got %s\n", LineCount,TOKEN_NAMES[desiredid], CurrToken.Buff);
+        parserError(TOKEN_NAMES[desiredid]);
     }
 
     getNextToken();

@@ -158,7 +158,7 @@ void ifTail() {
 
 		break;
 	default:
-
+		parserError("iftail (ELSE or ENDIF)");
 		break;
 	}
 }
@@ -220,7 +220,7 @@ void factor() {
 					
 		break;
 	default:
-
+		parserError("factor (ID, INTLITERAL, LPAREN, or MINUSOP)");
 		break;
 	}
 }
@@ -330,6 +330,8 @@ void lprimary() {
 		
 		break;
 	default:
+		//Because lprimary is never firstly optional
+		parserError("lprimary (INTLITERAL, ID, LPAREN, FALSEOF, TRUEOP, or NULLOP)");
 			
 		break;
 	}
@@ -365,7 +367,7 @@ void relOp() {
 			
 		break;
 	default:
-		
+
 		break;
 	}			
 }
