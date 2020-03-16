@@ -309,7 +309,7 @@ logical match(TokenId desiredid) {
     if (CurrToken.Id == desiredid) {
         success = ltrue;
     } else {
-        printf("Line %d: Expected %s, got %s\n", LineCount,LinePos,TOKEN_NAMES[desiredid], CurrToken.Buff);
+        printf("Line %d: Expected %s, got %s\n", LineCount,TOKEN_NAMES[desiredid], CurrToken.Buff);
     }
 
     getNextToken();
