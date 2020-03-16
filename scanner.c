@@ -305,10 +305,11 @@ void getNextToken() {
 logical match(TokenId desiredid) {
     logical success = lfalse;
 
+
     if (CurrToken.Id == desiredid) {
         success = ltrue;
     } else {
-        printf("Expected %s, got %s", TOKEN_NAMES[desiredid], CurrToken.Buff);
+        printf("Line %d: Expected %s, got %s\n", LineCount,LinePos,TOKEN_NAMES[desiredid], CurrToken.Buff);
     }
 
     getNextToken();

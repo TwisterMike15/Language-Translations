@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     if (init(argc, argv) == cont) {
         printf("\nScanning File\n");
         initScanner(InpFile);
+        systemgoal();
         cleanup();
         printf("Scan Complete\n");
     }

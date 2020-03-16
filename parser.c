@@ -43,6 +43,7 @@ logical isStatementList() {
 		case READ:
 		case WRITE:
 		case IF:
+		case WHILE:
 			success = ltrue;
 			break;
 	}
@@ -122,6 +123,7 @@ void statement() {
 		match(IF);
 		match(LPAREN);
 		condition();
+		match(RPAREN);
 		match(THEN);
 		statementList();
 		ifTail();
@@ -132,13 +134,10 @@ void statement() {
 		match(LPAREN);
 		condition();
 		match(RPAREN);
-			
-		if (isStatementList()) {
-			statementList();
-		} else {
-			match(ENDWHILE);
-		}
-			
+		
+		statementList();
+
+		match(ENDWHILE);
 		break;
 	default:
 
@@ -166,15 +165,10 @@ void ifTail() {
 
 void idList() {
 	match(ID);
-	switch (CurrToken.Id) {
-		case COMMA:
-			match(COMMA);
-			match(ID);
-		
-			break;
-		default:
-			
-			break;
+
+	while (CurrToken.Id == COMMA) {
+		match(COMMA);
+		match(ID);
 	}
 }
 
@@ -190,7 +184,7 @@ void exprList() {
 void expression() {
 	term();
 	
-	if ( isAddOp() ) {
+	while ( isAddOp() ) {
 		addOp();
 		term();
 	}
@@ -198,7 +192,7 @@ void expression() {
 
 void term() {
 	factor();
-	if ( isMultOp() ) {
+	while ( isMultOp() ) {
 		multOp();
 		factor();
 	}	
@@ -264,7 +258,7 @@ void multOp() {
 }
 void condition() {
 	addition();
-	if ( isRelOp() ) {
+	while ( isRelOp() ) {
 		relOp();
 		addition();
 	}
@@ -273,7 +267,7 @@ void condition() {
 void addition() {
 	multiplication();
 
-	if ( isAddOp() ) {
+	while ( isAddOp() ) {
 		addOp();
 		multiplication();
 	}
@@ -282,7 +276,7 @@ void addition() {
 void multiplication() {
 	unary();
 	
-	if ( isMultOp() ) {
+	while ( isMultOp() ) {
 		multOp();
 		unary();
 	}
