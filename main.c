@@ -24,7 +24,7 @@ file_outcome init(int argc, char* argv[]) {
     return fileCheck;
 }
 
-void finish() {
+void cleanup() {
     //closes files
     closeFiles();
 }
@@ -32,13 +32,12 @@ void finish() {
 int main(int argc, char* argv[]) {
 
     if (init(argc, argv) == cont) {
-        printf("\nScanning File\n");
+        
         initScanner(InpFile);
-        printf("Scan Complete. Parsing File \n");
+        printf("Scanner initialized. Parsing...\n");
         systemgoal();
-        printf("File has been parsed\n");
-        finish();
-       
+        printf("Parsing complete.\n");
+        cleanup();
     }
     else
     {

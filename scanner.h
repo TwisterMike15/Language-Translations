@@ -20,8 +20,6 @@ Language Translations
 #define TOKEN_BUFF_SIZE 100
 #define TOKEN_TYPE_SIZE 20
 
-
-
 static const char* TOKEN_NAMES[34] = {
 	"BEGIN",         //0
 	"END",           //1
@@ -103,9 +101,6 @@ typedef struct {
 	int BuffIndex;
 } tokendata;
 
-
-//*****************************Global Variables*****************************//
-logical singleDigitLog = lfalse;	//To check if single digit logical operator
 
 
 

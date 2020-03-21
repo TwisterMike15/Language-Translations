@@ -284,97 +284,58 @@ void multiplication() {
 
 void unary() {
 	switch(CurrToken.Id) {
-	case NOTOP:
-		match(NOTOP);
-		unary();
+		case NOTOP:
+			match(NOTOP);
+			unary();
 			
-		break;
-	case MINUSOP:
-		match(MINUSOP);
-		unary();
+			break;
+		case MINUSOP:
+			match(MINUSOP);
+			unary();
 			
-		break;
-	default:
-		lprimary();
+			break;
+		default:
+			lprimary();
 			
-		break;
+			break;
 	}
 }
 
 void lprimary() {
 	switch(CurrToken.Id) {
-	case INTLITERAL:
-		match(INTLITERAL);
+		case INTLITERAL:
+		case ID:
+		case FALSEOP:
+		case TRUEOP:
+		case NULLOP:
+			match(CurrToken.Id); //match any of the above ones as themself
+			break;
+		case LPAREN:
+			match(LPAREN);
+			condition();
+			match(RPAREN);
+			break;
+		default:
+			//Because lprimary is never firstly optional
+			parserError("lprimary (INTLITERAL, ID, LPAREN, FALSEOF, TRUEOP, or NULLOP)");
 			
-		break;
-	case ID:
-		match(ID);
-			
-		break;
-	case LPAREN:
-		match(LPAREN);
-		condition();
-		match(RPAREN);
-			
-		break;
-	case FALSEOP:
-		match(FALSEOP);
-			
-		break;
-	case TRUEOP:
-		match(TRUEOP);
-			
-		break;
-	case NULLOP:
-		match(NULLOP);
-		
-		break;
-	default:
-		//Because lprimary is never firstly optional
-		parserError("lprimary (INTLITERAL, ID, LPAREN, FALSEOF, TRUEOP, or NULLOP)");
-			
-		break;
+			break;
 	}
 }
 
 void relOp() {
 	switch(CurrToken.Id) {
-	case LESSEQUALOP:
-		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
-		match(LESSOP);
-		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
-		match(LESSEQUALOP);
-			
-		break;
-	case NOTEQUALOP:
-		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
-		match(LESSOP);
-		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
-		match(GREATEROP);
-			
-		break;
-	case LESSOP:
-		match(LESSOP);
-			
-		break;
-	case GREATEREQUALOP:
-		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
-		match(GREATEROP);
-		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
-		match(GREATEREQUALOP);
-			
-		break;
-	case GREATEROP:
-		match(GREATEROP);
-			
-		break;
-	case EQUALOP:
-		match(EQUALOP);
-			
-		break;
-	default:
+		case LESSEQUALOP:
+		case NOTEQUALOP:
+		case LESSOP:
+		case GREATEREQUALOP:
+		case GREATEROP:
+		case EQUALOP:
+			match(CurrToken.Id);
+			break;
 
-		break;
+		default:
+			break;
 	}			
 }
 
