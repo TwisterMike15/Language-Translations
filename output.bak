@@ -1,0 +1,16 @@
+Expected Token: BEGIN        Actual Token: BEGIN          
+Expected Token: ID           Actual Token: B              
+Expected Token: ASSIGNOP     Actual Token: :=             
+Expected Token: ID           Actual Token: A              
+Expected Token: SEMICOLON    Actual Token: ;              
+Expected Token: ID           Actual Token: B              
+Expected Token: ASSIGNOP     Actual Token: :=             
+Expected Token: INTLITERAL   Actual Token: 7              
+Expected Token: PLUSOP       Actual Token: +              
+Expected Token: ID           Actual Token: E              
+Expected Token: SEMICOLON    Actual Token: ;              
+Expected Token: ID           Actual Token: B              
+Expected Token: ASSIGNOP     Actual Token: :=             
+Expected Token: SEMICOLON    Actual Token: NULL           
+Expected Token: END          Actual Token: ;              
+Expected Token: EOF          Actual Token: WHILE          
