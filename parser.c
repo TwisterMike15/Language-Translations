@@ -340,12 +340,16 @@ void lprimary() {
 void relOp() {
 	switch(CurrToken.Id) {
 	case LESSEQUALOP:
+		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
 		match(LESSOP);
+		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
 		match(LESSEQUALOP);
 			
 		break;
 	case NOTEQUALOP:
+		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
 		match(LESSOP);
+		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
 		match(GREATEROP);
 			
 		break;
@@ -354,7 +358,9 @@ void relOp() {
 			
 		break;
 	case GREATEREQUALOP:
+		singleDigitLog = ltrue;		//Done so we do not print an error message- We were before
 		match(GREATEROP);
+		singleDigitLog = lfalse;	//Done so if there is an error with matching the 2nd relational operator, it is printed. Janky, I know
 		match(GREATEREQUALOP);
 			
 		break;

@@ -1,0 +1,29 @@
+begin -- first comment 
+		hi := 5;
+		write(hi);
+		A := c;
+		X:=d; while(!(b>19))
+		read(ab, bc, uigibear);
+		
+WRITE(10, ab, 23, 6);
+ENDWHILE
+IF(X>100) then 			--more comments
+Write(100);
+X := Y + 7 * Z / 2 * T - 6;	--this is my comment
+else
+WRITE(A, B);
+if(true)
+then read(Hello);		--even more comments
+ENDIF
+endif
+if(!(-A*2))
+then
+write(55+65, be);
+endif
+if (false)
+then write(10);
+endif
+if (null)
+then x := 6+9;
+endif
+end

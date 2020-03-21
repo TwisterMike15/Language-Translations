@@ -16,10 +16,11 @@ char LineBuff[LINE_BUFF_SIZE]           = { '\0' };
 char LisFileBuffer[OUTFILE_BUFF_SIZE]   = { '\0' };  //for formatting numbered lines in listing file
 char LexErrBuff[LINE_BUFF_SIZE]         = { '\0' };
 char ErrorBuffer[OUTFILE_BUFF_SIZE]     = { '\0' };  //for formatting lexical errors in listing file
+char TokenOutputBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
 
 int LexErrTotal = 0;
 int LexErrIndex = 0;
-
+int numOfLineTokens = 0;
 
 int LineCount = 1;
 int LinePos = 0;
@@ -293,10 +294,9 @@ void getNextToken() {
 
     NextToken.Name = TOKEN_NAMES[NextToken.Id];
 
+    numOfLineTokens++;
 
-    clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
-    sprintf(LisFileBuffer, "Token Number: %-12dToken Type: %-15sActual Token: %-15s\n", NextToken.Id, NextToken.Name, NextToken.Buff);
-    fputs(LisFileBuffer, OutFile);
+    
     //printf("%s", printBuffer);
 }
 
@@ -306,17 +306,19 @@ void parserError(const char *expected) {
 
 logical match(TokenId desiredid) {
     logical success = lfalse;
-
-
+    clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
+    sprintf(LisFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid] , CurrToken.Buff);
+    fputs(LisFileBuffer, OutFile);
     if (CurrToken.Id == desiredid) {
         success = ltrue;
-    } else {
+    } else if(!singleDigitLog){     //Checks singleDigitLog, so that we don't print out errors that we should not
         parserError(TOKEN_NAMES[desiredid]);
     }
-
     getNextToken();
     return success;
 }
+
+
 
 TokenId peekNextToken() {
     return NextToken.Id;

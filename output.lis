@@ -1,0 +1,20 @@
+ 1   begin
+ 2   b := a;
+ 3   b :=7+e;
+ 4   b := 6;
+ 5   while(pizza<>orange)
+ 6   
+ 7   endwhile
+ 8   read(a);
+ 9   write(a);
+10   
+11   if(b<a)
+12   then
+13   
+14   else
+15   
+16   endif
+17   
+18   
+19   end
+20   ÿ
