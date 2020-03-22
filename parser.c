@@ -39,13 +39,13 @@ void relOp();
 logical isStatementList() {
 	logical success = lfalse;
 	switch (CurrToken.Id) {
-		case ID:
-		case READ:
-		case WRITE:
-		case IF:
-		case WHILE:
-			success = ltrue;
-			break;
+	case ID:
+	case READ:
+	case WRITE:
+	case IF:
+	case WHILE:
+		success = ltrue;
+		break;
 	}
 	return success;
 }
@@ -61,14 +61,14 @@ logical isMultOp() {
 logical isRelOp() {
 	logical success = lfalse;
 	switch (CurrToken.Id) {
-		case LESSOP:
-		case LESSEQUALOP:
-		case GREATEROP:
-		case GREATEREQUALOP:
-		case EQUALOP:
-		case NOTEQUALOP:
-			success = ltrue;
-			break;
+	case LESSOP:
+	case LESSEQUALOP:
+	case GREATEROP:
+	case GREATEREQUALOP:
+	case EQUALOP:
+	case NOTEQUALOP:
+		success = ltrue;
+		break;
 	}
 	return success;
 }
@@ -91,7 +91,7 @@ void program() {
 void statementList() {
 	do {
 		statement();
-	} while ( isStatementList() );
+	} while (isStatementList());
 }
 
 void statement() {
@@ -134,7 +134,7 @@ void statement() {
 		match(LPAREN);
 		condition();
 		match(RPAREN);
-		
+
 		statementList();
 
 		match(ENDWHILE);
@@ -159,6 +159,7 @@ void ifTail() {
 		break;
 	default:
 		parserError("iftail (ELSE or ENDIF)");
+		getNextToken();
 		break;
 	}
 }
@@ -174,8 +175,8 @@ void idList() {
 
 void exprList() {
 	expression();
-	
-	while ( CurrToken.Id == COMMA ) {
+
+	while (CurrToken.Id == COMMA) {
 		match(COMMA);
 		exprList();
 	}
@@ -183,8 +184,8 @@ void exprList() {
 
 void expression() {
 	term();
-	
-	while ( isAddOp() ) {
+
+	while (isAddOp()) {
 		addOp();
 		term();
 	}
@@ -192,10 +193,10 @@ void expression() {
 
 void term() {
 	factor();
-	while ( isMultOp() ) {
+	while (isMultOp()) {
 		multOp();
 		factor();
-	}	
+	}
 }
 
 void factor() {
@@ -213,52 +214,53 @@ void factor() {
 		break;
 	case ID:
 		match(ID);
-			
+
 		break;
 	case INTLITERAL:
 		match(INTLITERAL);
-					
+
 		break;
 	default:
 		parserError("factor (ID, INTLITERAL, LPAREN, or MINUSOP)");
+		getNextToken();
 		break;
 	}
 }
 
 void addOp() {
-	switch(CurrToken.Id) {
-	case PLUSOP:		
+	switch (CurrToken.Id) {
+	case PLUSOP:
 		match(PLUSOP);
-			
+
 		break;
 	case MINUSOP:
 		match(MINUSOP);
-	
+
 		break;
 	default:
-		
+
 		break;
 	}
 }
 
 void multOp() {
-	switch(CurrToken.Id) {
+	switch (CurrToken.Id) {
 	case MULTOP:
 		match(MULTOP);
-			
+
 		break;
 	case DIVOP:
 		match(DIVOP);
-			
+
 		break;
 	default:
-		
+
 		break;
 	}
 }
 void condition() {
 	addition();
-	while ( isRelOp() ) {
+	while (isRelOp()) {
 		relOp();
 		addition();
 	}
@@ -267,7 +269,7 @@ void condition() {
 void addition() {
 	multiplication();
 
-	while ( isAddOp() ) {
+	while (isAddOp()) {
 		addOp();
 		multiplication();
 	}
@@ -275,67 +277,69 @@ void addition() {
 
 void multiplication() {
 	unary();
-	
-	while ( isMultOp() ) {
+
+	while (isMultOp()) {
 		multOp();
 		unary();
 	}
 }
 
 void unary() {
-	switch(CurrToken.Id) {
-		case NOTOP:
-			match(NOTOP);
-			unary();
-			
-			break;
-		case MINUSOP:
-			match(MINUSOP);
-			unary();
-			
-			break;
-		default:
-			lprimary();
-			
-			break;
+	switch (CurrToken.Id) {
+	case NOTOP:
+		match(NOTOP);
+		unary();
+
+		break;
+	case MINUSOP:
+		match(MINUSOP);
+		unary();
+
+		break;
+	default:
+		lprimary();
+
+		break;
 	}
 }
 
 void lprimary() {
-	switch(CurrToken.Id) {
-		case INTLITERAL:
-		case ID:
-		case FALSEOP:
-		case TRUEOP:
-		case NULLOP:
-			match(CurrToken.Id); //match any of the above ones as themself
-			break;
-		case LPAREN:
-			match(LPAREN);
-			condition();
-			match(RPAREN);
-			break;
-		default:
-			//Because lprimary is never firstly optional
-			parserError("lprimary (INTLITERAL, ID, LPAREN, FALSEOF, TRUEOP, or NULLOP)");
-			
-			break;
+	switch (CurrToken.Id) {
+	case INTLITERAL:
+	case ID:
+	case FALSEOP:
+	case TRUEOP:
+	case NULLOP:
+		match(CurrToken.Id); //match any of the above ones as themself
+		break;
+	case LPAREN:
+		match(LPAREN);
+		condition();
+		match(RPAREN);
+		break;
+	default:
+		//Because lprimary is never firstly optional
+		parserError("lprimary (INTLITERAL, ID, LPAREN, FALSEOF, TRUEOP, or NULLOP)");
+		getNextToken();
+
+
+		break;
 	}
 }
 
 void relOp() {
-	switch(CurrToken.Id) {
-		case LESSEQUALOP:
-		case NOTEQUALOP:
-		case LESSOP:
-		case GREATEREQUALOP:
-		case GREATEROP:
-		case EQUALOP:
-			match(CurrToken.Id);
-			break;
+	switch (CurrToken.Id) {
+	case LESSEQUALOP:
+	case NOTEQUALOP:
+	case LESSOP:
+	case GREATEREQUALOP:
+	case GREATEROP:
+	case EQUALOP:
+		match(CurrToken.Id);
+		break;
 
-		default:
-			break;
-	}			
+	default:
+		break;
+	}
 }
 

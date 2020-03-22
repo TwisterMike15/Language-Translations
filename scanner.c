@@ -12,11 +12,16 @@ Language Translations
 #include "file_util.h"
 #include "scanner.h"
 
+
+
+
 char LineBuff[LINE_BUFF_SIZE] = { '\0' };
 char LisFileBuffer[OUTFILE_BUFF_SIZE] = { '\0' };  //for formatting numbered lines in listing file
 char LexErrBuff[LINE_BUFF_SIZE] = { '\0' };
 char ErrorBuffer[OUTFILE_BUFF_SIZE] = { '\0' };  //for formatting lexical errors in listing file
 char TokenOutputBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
+char syntaxErrorBuff[OUTFILE_BUFF_SIZE][OUTFILE_BUFF_SIZE] = { '\0' };
+char outFileBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
 
 int LexErrTotal = 0;
 int LexErrIndex = 0;
@@ -24,9 +29,11 @@ int LexErrIndex = 0;
 int LineCount = 1;
 int LinePos = 0;
 
+int syntaxErrIndex = 0;
+int syntaxErrTotal = 0;
 
 
-
+void printSyntaxErr(void);
 
 
 
@@ -93,7 +100,7 @@ char consumeChar() {
     char filechar = fgetc(InpFile);
 
     //Check if a list needs to be printed to the lisfile
-    if (filechar == '\n' || (filechar == EOF && LinePos > 0)) {
+    if (filechar == '\n' || (filechar == EOF && LinePos > 0 )) {
         int i = 0;
 
         //Format the collected line. No need to clear buffer.
@@ -109,6 +116,8 @@ char consumeChar() {
         }
         LexErrIndex = 0; //Reset errors for next line
 
+        printSyntaxErr();
+
         //Clear error and line buffers
         memset(LexErrBuff, '\0', LINE_BUFF_SIZE);
         memset(LineBuff, '\0', LINE_BUFF_SIZE);
@@ -117,12 +126,11 @@ char consumeChar() {
         LinePos = 0;
         LineCount++;
     }
-    else {
+    else if (filechar != EOF) {
         //Append character to lineBuffer.
         LineBuff[LinePos] = filechar;
         LinePos++;
     }
-
     return toupper(filechar);
 }
 
@@ -294,20 +302,54 @@ void getNextToken() {
     NextToken.Name = TOKEN_NAMES[NextToken.Id];
 }
 
-void parserError(const char* expected) {
-    printf("Line %d: Expected %s, got '%s'\n", LineCount, expected, CurrToken.Buff);
+void parserError(char* expected) {
+    
+    sprintf(syntaxErrorBuff[syntaxErrIndex], "Syntax Error on line %2d-   %s recieved   %s expected\n", LineCount, CurrToken.Name, expected);
+    syntaxErrIndex++;
+    syntaxErrTotal++;
+}
+
+void printSyntaxErr() {
+
+    int i = 0;
+   
+    //Print each lex error
+    for (i = 0; i < syntaxErrIndex; i++)
+    {
+        
+        fputs(syntaxErrorBuff[i], LisFile);
+    }
+    syntaxErrIndex = 0; //Reset errors for next line
+
+    //Clear error and line buffers
+    memset(syntaxErrorBuff, '\0', LINE_BUFF_SIZE);
+   
+    //Reset line index
+    syntaxErrIndex = 0;
 }
 
 logical match(TokenId desiredid) {
     logical success = lfalse;
-    clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
-    sprintf(LisFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid], CurrToken.Buff);
-    fputs(LisFileBuffer, OutFile);
+
+    clearBuffer(outFileBuffer, OUTFILE_BUFF_SIZE);
+    sprintf(outFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid], CurrToken.Buff);
+    fputs(outFileBuffer, OutFile);
+
     if (CurrToken.Id == desiredid) {
         success = ltrue;
+
+    }
+    else {
+        parserError(TOKEN_NAMES[desiredid]);
+       
     }
 
-    getNextToken();
+
+    //get next token & clear LEXERRs
+    do {
+        getNextToken();
+    } while (CurrToken.Id == LEXERR);
+
     return success;
 }
 
