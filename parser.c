@@ -80,6 +80,7 @@ logical isRelOp() {
 void systemgoal() {
 	program();
 	match(SCANEOF);
+	printNumOfErrors();
 }
 
 void program() {

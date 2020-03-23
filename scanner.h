@@ -110,10 +110,12 @@ tokendata NextToken;
 
 
 
-//*****************************Methods*******************************//
+//*****************************Functions*******************************//
 logical match(TokenId);
 TokenId peekNextToken();
 void initScanner();
 void printLexErrors();
+void printNumOfErrors();
+void clearBuffer(char*, int);
 
 #endif

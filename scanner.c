@@ -328,6 +328,27 @@ void printSyntaxErr() {
     syntaxErrIndex = 0;
 }
 
+
+void printNumOfErrors()
+{
+    if (LexErrTotal > 0 || syntaxErrTotal > 0)
+    {
+        clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
+        sprintf(LisFileBuffer, "\nInput File Compiled with Errors");
+        fputs(LisFileBuffer, LisFile);
+    }
+    else
+    {
+        clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
+        sprintf(LisFileBuffer, "\nInput File Compiled without Errors");
+        fputs(LisFileBuffer, LisFile);
+    }
+
+    clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
+    sprintf(LisFileBuffer, "\nTotal Number of Lexical Errors: %d     Total Number of Syntax Errors: %d", LexErrTotal, syntaxErrTotal);
+    fputs(LisFileBuffer, LisFile);
+}
+
 logical match(TokenId desiredid) {
     logical success = lfalse;
 
@@ -339,7 +360,7 @@ logical match(TokenId desiredid) {
         success = ltrue;
 
     }
-    else {
+    else if (CurrToken.Id != SCANEOF && NextToken.Id != SCANEOF){
         parserError(TOKEN_NAMES[desiredid]);
        
     }
