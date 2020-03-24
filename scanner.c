@@ -106,6 +106,7 @@ char consumeChar() {
         //Format the collected line. No need to clear buffer.
         sprintf(LisFileBuffer, "%2d   %s\n", LineCount, LineBuff);
         fputs(LisFileBuffer, LisFile);
+        fputs(LisFileBuffer, OutFile);
 
         //Print each lex error
         for (i = 0; i < LexErrIndex; i++)
@@ -360,7 +361,7 @@ logical match(TokenId desiredid) {
         success = ltrue;
 
     }
-    else if (CurrToken.Id != SCANEOF && NextToken.Id != SCANEOF){
+    else if (CurrToken.Id != SCANEOF || NextToken.Id != SCANEOF){
         parserError(TOKEN_NAMES[desiredid]);
        
     }
