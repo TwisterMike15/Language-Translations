@@ -13,27 +13,33 @@ Language Translations
 #include "scanner.h"
 
 
-
-
-char LineBuff[LINE_BUFF_SIZE] = { '\0' };
-char LisFileBuffer[OUTFILE_BUFF_SIZE] = { '\0' };  //for formatting numbered lines in listing file
 char LexErrBuff[LINE_BUFF_SIZE] = { '\0' };
 char ErrorBuffer[OUTFILE_BUFF_SIZE] = { '\0' };  //for formatting lexical errors in listing file
 char TokenOutputBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
 char syntaxErrorBuff[OUTFILE_BUFF_SIZE][OUTFILE_BUFF_SIZE] = { '\0' };
 char outFileBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
+char outFileStatementBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
+
+char LisFileBuffer[OUTFILE_BUFF_SIZE] = { '\0' };  //for formatting numbered lines in listing file
+char LineBuff[LINE_BUFF_SIZE] = { '\0' };
+int LineCount = 1;
 
 int LexErrTotal = 0;
 int LexErrIndex = 0;
 
-int LineCount = 1;
+
 int LinePos = 0;
 
 int syntaxErrIndex = 0;
 int syntaxErrTotal = 0;
 
+logical endOfLine = lfalse;
 
-void printSyntaxErr(void);
+
+
+//void printSyntaxErr();
+
+
 
 
 
@@ -100,13 +106,21 @@ char consumeChar() {
     char filechar = fgetc(InpFile);
 
     //Check if a list needs to be printed to the lisfile
-    if (filechar == '\n' || (filechar == EOF && LinePos > 0 )) {
+    if (filechar == '\n' || (filechar == EOF && LinePos > 0)) {
         int i = 0;
 
         //Format the collected line. No need to clear buffer.
         sprintf(LisFileBuffer, "%2d   %s\n", LineCount, LineBuff);
         fputs(LisFileBuffer, LisFile);
-        fputs(LisFileBuffer, OutFile);
+
+        endOfLine = ltrue;
+        /*if (outFileStatementBuffer[0] != '\0')
+        {
+
+            fputs(outFileStatementBuffer, OutFile);
+            clearBuffer(outFileStatementBuffer, OUTFILE_BUFF_SIZE);
+            sprintf(outFileStatementBuffer, "Statement: ");
+        }*/
 
         //Print each lex error
         for (i = 0; i < LexErrIndex; i++)
@@ -304,7 +318,8 @@ void getNextToken() {
 }
 
 void parserError(char* expected) {
-    
+    printf("\nInside of parseError\n");
+
     sprintf(syntaxErrorBuff[syntaxErrIndex], "Syntax Error on line %2d-   %s recieved   %s expected\n", LineCount, CurrToken.Name, expected);
     syntaxErrIndex++;
     syntaxErrTotal++;
@@ -313,18 +328,20 @@ void parserError(char* expected) {
 void printSyntaxErr() {
 
     int i = 0;
-   
+
+    printf("\nInside of PrintSyntaxErr\n");
+
     //Print each lex error
     for (i = 0; i < syntaxErrIndex; i++)
     {
-        
+
         fputs(syntaxErrorBuff[i], LisFile);
     }
     syntaxErrIndex = 0; //Reset errors for next line
 
     //Clear error and line buffers
     memset(syntaxErrorBuff, '\0', LINE_BUFF_SIZE);
-   
+
     //Reset line index
     syntaxErrIndex = 0;
 }
@@ -346,7 +363,7 @@ void printNumOfErrors()
     }
 
     clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
-    sprintf(LisFileBuffer, "\nTotal Number of Lexical Errors: %d     Total Number of Syntax Errors: %d", LexErrTotal, syntaxErrTotal);
+    sprintf(LisFileBuffer, "Total Number of Lexical Errors: %d     Total Number of Syntax Errors: %d\n", LexErrTotal, syntaxErrTotal);
     fputs(LisFileBuffer, LisFile);
 }
 
@@ -357,13 +374,21 @@ logical match(TokenId desiredid) {
     sprintf(outFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid], CurrToken.Buff);
     fputs(outFileBuffer, OutFile);
 
+    strcat(outFileStatementBuffer, CurrToken.Buff);
+    if (CurrToken.Id == SEMICOLON || endOfLine == ltrue || CurrToken.Id == SCANEOF)
+    {
+        strcat(outFileStatementBuffer, "\n\n");
+        fputs(outFileStatementBuffer, OutFile);
+        clearBuffer(outFileStatementBuffer, OUTFILE_BUFF_SIZE);
+        sprintf(outFileStatementBuffer, "\nStatement: ");
+        endOfLine = lfalse;
+    }
+
     if (CurrToken.Id == desiredid) {
         success = ltrue;
-
     }
-    else if (CurrToken.Id != SCANEOF || NextToken.Id != SCANEOF){
+    else if (CurrToken.Id != SCANEOF || NextToken.Id != SCANEOF) {
         parserError(TOKEN_NAMES[desiredid]);
-       
     }
 
 
@@ -382,12 +407,21 @@ TokenId peekNextToken() {
 }
 
 
+//Used to finish printing at the end of the file
+void endOfPrinting()
+{
+    sprintf(LisFileBuffer, "%2d   %s\n", LineCount, LineBuff);
+    fputs(LisFileBuffer, LisFile);
+    printSyntaxErr();
+    printNumOfErrors();
 
+}
 
 //*** Primary Scanner Function ***//
 
 void initScanner()
 {
+    strcat(outFileStatementBuffer, "\nStatement: "); //Janky, I know. Don't judge me too hard. Here for formatting
     getNextToken(); //put first token into NextToken
     getNextToken(); //put first token into CurrToken, and second token into NextToken
 }

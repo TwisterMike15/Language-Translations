@@ -32,7 +32,7 @@ void multiplication();
 void unary();
 void lprimary();
 void relOp();
-
+void endOfPrinting();
 
 
 //Checks for **optional** productions
@@ -80,7 +80,7 @@ logical isRelOp() {
 void systemgoal() {
 	program();
 	match(SCANEOF);
-	printNumOfErrors();
+	endOfPrinting();
 }
 
 void program() {
