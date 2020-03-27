@@ -116,5 +116,6 @@ TokenId peekNextToken();
 void initScanner();
 void printLexErrors();
 void endOfPrinting();
+void printSyntaxErr(void);
 
 #endif

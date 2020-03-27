@@ -37,7 +37,7 @@ logical endOfLine = lfalse;
 
 
 
-//void printSyntaxErr();
+
 
 
 
@@ -352,13 +352,13 @@ void printNumOfErrors()
     if (LexErrTotal > 0 || syntaxErrTotal > 0)
     {
         clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
-        sprintf(LisFileBuffer, "\nInput File Compiled with Errors");
+        sprintf(LisFileBuffer, "\nInput File Compiled with Errors\n");
         fputs(LisFileBuffer, LisFile);
     }
     else
     {
         clearBuffer(LisFileBuffer, OUTFILE_BUFF_SIZE);
-        sprintf(LisFileBuffer, "\nInput File Compiled without Errors");
+        sprintf(LisFileBuffer, "\nInput File Compiled without Errors\n");
         fputs(LisFileBuffer, LisFile);
     }
 
