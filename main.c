@@ -18,7 +18,7 @@ file_outcome init(int argc, char* argv[]) {
 
     if (fileCheck == cont)
     {
-        fputs("The temp", TmpFile);
+        
     }
 
     return fileCheck;

@@ -6,16 +6,16 @@
 
 
 typedef char IdString[100];
-enum Expr{ IDEXPR, LITERALEXPR, TEMPEXPR } typedef Expr;
+enum ExprType{ IDEXPR, LITERALEXPR, TEMPEXPR } typedef ExprType;
 
-typedef struct Op_Rec {
+typedef struct OpRec {
 	IdString op;
-} Op_Rec;
+} OpRec;
 
-typedef struct Expr_Rec {
+typedef struct ExprRec {
 	IdString data;
-	Expr expr;
-} Expr_Rec;
+	ExprType type;
+} ExprRec;
 
 
 
@@ -25,7 +25,7 @@ logical isInSymbolTable(IdString Id);
 logical registerSymbol(IdString Id);
 
 
-
+void generateIfStatement(ExprRec Condition);
 
 
 

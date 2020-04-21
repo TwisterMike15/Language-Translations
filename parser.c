@@ -12,6 +12,7 @@ Language Translations
 #include "parser.h"
 #include "file_util.h"
 #include "scanner.h"
+#include "generator.h"
 
 //Production Prototypes
 void systemgoal();
@@ -123,7 +124,7 @@ void statement() {
 	case IF:
 		match(IF);
 		match(LPAREN);
-		condition();
+		generateIfStatement( condition() );
 		match(RPAREN);
 		match(THEN);
 		statementList();
@@ -133,7 +134,7 @@ void statement() {
 	case WHILE:
 		match(WHILE);
 		match(LPAREN);
-		condition();
+		generateWhileStatement( condition() );
 		match(RPAREN);
 
 		statementList();
