@@ -1,10 +1,5 @@
-
-
-
-
-
-
 #include "generator.h"
+#include "scanner.h"
 
 //Design discussed with Anthony Carrola
 
@@ -12,6 +7,51 @@
 
 IdString SymbolTable[100];
 int SymbolCount = 0;
+
+
+//didn't think about this when implementing the scanner. don't like switch cases and other methods so this works
+//sorry it's ugly
+static const char* OPERATOR_LOOKUP[34] = {
+	NULL,    //0
+	NULL,    //1
+	NULL,    //2
+	NULL,    //3
+	NULL,    //4
+	NULL,    //5
+	NULL,    //6
+	NULL,    //7
+	NULL,    //8
+	NULL,    //9
+	"0",     //10
+	"1",     //11
+	"NULL",  //12
+	NULL,    //13
+	NULL,    //14
+	NULL,    //15
+	NULL,    //16
+	NULL,    //17
+	"+",     //18
+	"-",     //19
+	"*",     //20
+	"/",     //21
+	NULL,    //22
+	"<",     //23
+	"<=",    //24
+	">",     //25
+	">=",    //26
+	"==",    //27
+	"<>",    //28
+	NULL,    //29
+	NULL,    //30
+	NULL,    //31
+	NULL,    //32
+	NULL	 //33
+};
+
+
+OpRec processOp(TokenId OpEnum);
+ExprRec processLiteral(char* TokenContent);
+ExprRec processId(char* TokenContent);
 
 logical isInSymbolTable(IdString Id) {
 	logical success = lfalse;
@@ -51,47 +91,113 @@ char* registerTemp() {
 }
 
 
-void generate(const char* s1, const char* s2, const char* s3, const char* s4, const char* s5, const char* s6, const char* s7, const char* s8) {
-	fprintf(TmpFile, "%s%s%s%s%s%s%s%s", s1, s2, s3, s4, s5, s6, s7, s8);
+void generate(const char* output) {
+	fprintf(TmpFile, "%s", output);
 }
 
 
-char* prefixString(char* buff, char prefix) {
-	int length = strlen(buff), i = 0;
-	IdString adjusted = { 0 };
 
-	strn[0] = prefix;
-	for (i = 0; i < length; i++)
-	{
-		strn[i + 1] = buff[i];
+
+
+
+
+
+
+
+
+void prefixString(char* buff, char prefix) {
+	int length = strlen(buff);
+	int i = 0;
+
+	//Begin from end, copy every char from previous index
+	for (i = length; i > 0; i--) {
+		buff[i] = buff[i - 1];
 	}
-	strcpy(buff, strn);
-
-	return buff;
+	buff[0] = prefix;
 }
 
-ExprRec generateCondition(ExprRec LeftExpr, OpRec OpCond, ExprRec RightExpr) {
+OpRec processOp(TokenId OpEnum)							//Processes operands
+{
+	OpRec oper;
+	strcpy(oper.op, OPERATOR_LOOKUP[OpEnum]);
+	return oper;
+}
+
+ExprRec processLiteral(char* TokenContent)			//processes literals
+{
+	ExprRec lit;
+	lit.type = LITERALEXPR;
+	strcpy(lit.data, TokenContent);
+	return lit;
+}
+
+ExprRec processId(char* TokenContent)				//processes IDs that are the current token
+{
+	ExprRec idvar;
+	registerSymbol(TokenContent);
+	idvar.type = IDEXPR;							//sets the kind
+	strcpy(idvar.data, TokenContent);					//sets the data
+	return idvar;									//returns our expression now
+}
+
+
+
+ExprRec generateCondition(ExprRec LeftExpr, OpRec Operator, ExprRec RightExpr) {
 	ExprRec tempexpr;
 	tempexpr.type = TEMPEXPR;
 	strcpy(tempexpr.data, registerTemp());
 
-	generate(tempexpr.data," = ",LeftExpr.data," ",OpCond.op," ",RightExpr.data,";\n");
+	generate(tempexpr.data);
+	generate(" = ");
+	generate(LeftExpr.data);
+	generate(" ");
+	generate(Operator.op);
+	generate(" ");
+	generate(RightExpr.data);
+	generate(";\n");
 
 	return tempexpr;
 }
 
-void generateIfStatement(ExprRec Condition)
-{
-	generate("if( ", Condition.data, " )\n{\n", "", "", "", "", "");
+void generateRead(char* TokenContent) {
+	ExprRec idrec = processId(TokenContent);
+	//**************************************************
+	generate("scanf(\"%%d\", &%s);\n");
+	generate(idrec.data);
 }
 
-void generateWhileStatement(ExprRec Condition)
+ExprRec generateInfix(ExprRec LeftOp, OpRec OpInf, ExprRec RightOp)		//generates expressions
 {
-	generate("while( ", Condition.data, " )\n{\n", "", "", "", "", "");
+	ExprRec tempexpr;
+	tempexpr.type = TEMPEXPR;
+	strcpy(tempexpr.data, registerTemp());
+	generate(tempexpr.data);
+	generate("=");
+	generate(LeftOp.data);
+	generate(OpInf.op);
+	generate(RightOp.data);
+	generate(";\n");
+	return tempexpr;
+}
+
+
+void generateIfStatement(ExprRec Condition) {
+	generate("if( ");
+	generate(Condition.data);
+	generate(" )\n{\n");
+}
+
+void generateWhileStatement(ExprRec Condition) {
+	generate("while( ");
+	generate(Condition.data);
+	generate(" )\n{\n");
 }
 
 void generateAssignment(ExprRec Target, ExprRec Source) {
-	generate(Target.data, " = ", Source.data, ";\n", "", "", "", "");
+	generate(Target.data);
+	generate(" = ");
+	generate(Source.data);
+	generate(";\n");
 }
 
 void generateWriteStatement(ExprRec WriteExpression) {
@@ -100,49 +206,16 @@ void generateWriteStatement(ExprRec WriteExpression) {
 	generate(" );\n");
 }
 
-expr_rec generateInfix(ExprRec LeftOp, OpRec OpInf, ExprRec RightOp)		//generates expressions
-{
-	ExprRec tempexpr;
-	tempexpr.type = TEMPEXPR;
-	strcpy(tempexpr.data, registerTemp());
-	generate(tempexpr.data);
-	generate("=");
-	generate(LeftOp.data); 
-	generate(OpInf.operate); 
-	generate(RightOp.data);
-	generate(";\n");
-	return tempexpr;
-}
 
-void GenerateReadID(tokendata CurrToken)
-	ExprRec idrec = processID(CurrToken);
-	//**************************************************
-	generate(temp_file);
-	generate("scanf(\"%%d\", &%s);\n");
-	Generate(idrec.data);
-}
 
-OpRec processOp(int type)							//Processes operands	
-{
-	OpRec oper;
-	strcpy(oper.operate, TOKEN_ARRAY[type]);
-	return oper;
-}
 
-ExprRec processLiteral(tokendata CurrToken)			//processes literals
-{
-	ExprRec lit;
-	lit.kind = LITERALEXPR;
-	strcpy(lit.data, CurrToken);
-	return lit;
-}
 
-ExprRec processID(tokendata CurrToken)				//processes IDs that are the current token
-{
-	ExprRec idvar;
-	RegisterSymbol(CurrToken); 
-	idvar.kind = IDEXPR;							//sets the kind
-	strcpy(idvar.data, CurrToken);					//sets the data
-	return idvar;									//returns our expression now
-}
+
+
+
+
+
+
+
+
 

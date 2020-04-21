@@ -27,7 +27,7 @@ void term();
 void factor();
 void addOp();
 void multOp();
-void condition();
+ExprRec condition();
 void addition();
 void multiplication();
 void unary();
@@ -97,11 +97,15 @@ void statementList() {
 }
 
 void statement() {
+	ExprRec target, source;
+
 	switch (CurrToken.Id) {
 	case ID:
+		target = processId(CurrToken.Buff);
 		match(ID);
 		match(ASSIGNOP);
-		expression();
+		expression(&source);
+		generateAssignment(target, source);
 		match(SEMICOLON);
 
 		break;
@@ -176,7 +180,10 @@ void idList() {
 }
 
 void exprList() {
-	expression();
+	ExprRec exprlist_root;
+
+	expression(&exprlist_root);
+	generateWriteStatement(exprlist_root);
 
 	while (CurrToken.Id == COMMA) {
 		match(COMMA);
@@ -184,41 +191,59 @@ void exprList() {
 	}
 }
 
-void expression() {
-	term();
+void expression(ExprRec *ResultExpression) {
+	ExprRec operand_left, operand_right;
+	OpRec operator;
+
+	term(&operand_left);
 
 	while (isAddOp()) {
-		addOp();
-		term();
+		addOp(&operator);
+		term(&operand_right);
+		operand_left = generateInfix(operand_left,operator,operand_right);
 	}
+	*ResultExpression = operand_left;
 }
 
-void term() {
-	factor();
+void term(ExprRec *ResultExpression) {
+	ExprRec operand_left, operand_right;
+	OpRec operator;
+
+	factor(&operand_left);
 	while (isMultOp()) {
-		multOp();
-		factor();
+		multOp(&operator);
+		factor(&operand_right);
+		operand_left = generateInfix(operand_left, operator,operand_right);
 	}
+	*ResultExpression = operand_left;
 }
 
-void factor() {
+void factor(ExprRec *ResultExpression) {
+	ExprRec tempresult;
+
 	switch (CurrToken.Id) {
 	case LPAREN:		//'('
 		match(LPAREN);
-		expression();
+		expression(&tempresult);
+		*ResultExpression = tempresult;
+
 		match(RPAREN);
 
 		break;
 	case MINUSOP:
 		match(MINUSOP);
-		factor();
+		factor(&tempresult);
+		prefixString(tempresult, '-');
+		*ResultExpression = tempresult;
 
 		break;
 	case ID:
+		*ResultExpression = processId(CurrToken.Buff);
 		match(ID);
 
 		break;
 	case INTLITERAL:
+		*ResultExpression = processLiteral(CurrToken.Buff);
 		match(INTLITERAL);
 
 		break;
@@ -229,14 +254,16 @@ void factor() {
 	}
 }
 
-void addOp() {
+void addOp(OpRec *ResultOp) {
 	switch (CurrToken.Id) {
 	case PLUSOP:
 		match(PLUSOP);
+		*ResultOp = processOp(PLUSOP);
 
 		break;
 	case MINUSOP:
 		match(MINUSOP);
+		*ResultOp = processOp(MINUSOP);
 
 		break;
 	default:
@@ -245,14 +272,16 @@ void addOp() {
 	}
 }
 
-void multOp() {
+void multOp(OpRec *ResultOperator) {
 	switch (CurrToken.Id) {
 	case MULTOP:
 		match(MULTOP);
+		*ResultOperator = processOp(MULTOP);
 
 		break;
 	case DIVOP:
 		match(DIVOP);
+		*ResultOperator = processOp(DIVOP);
 
 		break;
 	default:
@@ -260,63 +289,112 @@ void multOp() {
 		break;
 	}
 }
-void condition() {
-	addition();
+
+ExprRec condition() {
+	ExprRec condition_left, condition_right;
+	OpRec condition_op;
+
+	//Get left-side of condition
+	addition(&condition_left);
+
 	while (isRelOp()) {
-		relOp();
-		addition();
+		//Get operator
+		relOp(&condition_op);
+
+		//Get right-side of condition
+		addition(&condition_right);
+
+		//make the left, op, and right parts of condition into a new ExprRec, for the next iteration
+		condition_left = generateCondition(condition_left, condition_op, condition_right);
 	}
+
+	return condition_left;
 }
 
-void addition() {
-	multiplication();
+void addition(ExprRec *Condition) {
+	ExprRec add_left, add_right;
+	OpRec add_op;
+
+	multiplication(&add_left);
 
 	while (isAddOp()) {
-		addOp();
-		multiplication();
+		addOp(&add_op);
+		multiplication(&add_right);
+		add_left = generateCondition(add_left, add_op, add_right);
 	}
+
+	*Condition = add_left;
 }
 
-void multiplication() {
-	unary();
+void multiplication(ExprRec *Condition) {
+	ExprRec mult_left, mult_right;
+	OpRec mult_op;
+
+	unary(&mult_left);
 
 	while (isMultOp()) {
-		multOp();
-		unary();
+		multOp(&mult_op);
+		unary(&mult_right);
+		mult_left = generateCondition(mult_left, mult_op, mult_right);
 	}
+
+	*Condition = mult_left;
 }
 
-void unary() {
+void unary(ExprRec *Condition) {
+	ExprRec expression;
+	
+
 	switch (CurrToken.Id) {
 	case NOTOP:
 		match(NOTOP);
-		unary();
+		unary(&expression);
+		prefixString(expression.data, '!');
+		*Condition = expression;
 
 		break;
 	case MINUSOP:
 		match(MINUSOP);
-		unary();
+		unary(&expression);
+		prefixString(expression.data, '!');
+		*Condition = expression;
 
 		break;
 	default:
-		lprimary();
+		lprimary(&expression);
+		*Condition = expression;
 
 		break;
 	}
+
 }
 
-void lprimary() {
+void lprimary(ExprRec *Condition) {
+	OpRec temp;
+
 	switch (CurrToken.Id) {
-	case INTLITERAL:
-	case ID:
 	case FALSEOP:
 	case TRUEOP:
 	case NULLOP:
-		match(CurrToken.Id); //match any of the above ones as themself
+		//match any of the above ones as themself
+		temp = processOp(CurrToken.Id);
+		strcpy(Condition->data, temp.op);
+		match(CurrToken.Id); 
+		
+		break;
+	case ID:
+		*Condition = processId(CurrToken.Buff);
+		match(ID);
+
+		break;
+	case INTLITERAL:
+		*Condition = processLiteral(CurrToken.Buff);
+		match(INTLITERAL); //match any of the above ones as themself
+
 		break;
 	case LPAREN:
 		match(LPAREN);
-		condition();
+		*Condition = condition();
 		match(RPAREN);
 		break;
 	default:
@@ -329,7 +407,7 @@ void lprimary() {
 	}
 }
 
-void relOp() {
+void relOp(OpRec *Operator) {
 	switch (CurrToken.Id) {
 	case LESSEQUALOP:
 	case NOTEQUALOP:
@@ -337,6 +415,7 @@ void relOp() {
 	case GREATEREQUALOP:
 	case GREATEROP:
 	case EQUALOP:
+		*Operator = processOp(CurrToken.Id);
 		match(CurrToken.Id);
 		break;
 
