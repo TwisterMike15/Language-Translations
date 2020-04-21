@@ -70,12 +70,12 @@ char* prefixString(char* buff, char prefix) {
 	return buff;
 }
 
-ExprRec generateCondition(ExprRec LeftExpr, OpRec Operator, ExprRec RightExpr) {
+ExprRec generateCondition(ExprRec LeftExpr, OpRec OpCond, ExprRec RightExpr) {
 	ExprRec tempexpr;
 	tempexpr.type = TEMPEXPR;
 	strcpy(tempexpr.data, registerTemp());
 
-	generate(tempexpr.data," = ",LeftExpr.data," ",Operator.op," ",RightExpr.data,";\n");
+	generate(tempexpr.data," = ",LeftExpr.data," ",OpCond.op," ",RightExpr.data,";\n");
 
 	return tempexpr;
 }
@@ -95,20 +95,54 @@ void generateAssignment(ExprRec Target, ExprRec Source) {
 }
 
 void generateWriteStatement(ExprRec WriteExpression) {
-
+	generate("printf( ");
+	generate(WriteExpression.data);
+	generate(" );\n");
 }
 
+expr_rec generateInfix(ExprRec LeftOp, OpRec OpInf, ExprRec RightOp)		//generates expressions
+{
+	ExprRec tempexpr;
+	tempexpr.type = TEMPEXPR;
+	strcpy(tempexpr.data, registerTemp());
+	generate(tempexpr.data);
+	generate("=");
+	generate(LeftOp.data); 
+	generate(OpInf.operate); 
+	generate(RightOp.data);
+	generate(";\n");
+	return tempexpr;
+}
 
+void GenerateReadID(tokendata CurrToken)
+	ExprRec idrec = processID(CurrToken);
+	//**************************************************
+	generate(temp_file);
+	generate("scanf(\"%%d\", &%s);\n");
+	Generate(idrec.data);
+}
 
+OpRec processOp(int type)							//Processes operands	
+{
+	OpRec oper;
+	strcpy(oper.operate, TOKEN_ARRAY[type]);
+	return oper;
+}
 
+ExprRec processLiteral(tokendata CurrToken)			//processes literals
+{
+	ExprRec lit;
+	lit.kind = LITERALEXPR;
+	strcpy(lit.data, CurrToken);
+	return lit;
+}
 
-
-
-
-
-
-
-
-
-
+ExprRec processID(tokendata CurrToken)				//processes IDs that are the current token
+{
+	ExprRec idvar;
+	RegisterSymbol(CurrToken); 
+	idvar.kind = IDEXPR;							//sets the kind
+	strcpy(idvar.data, CurrToken);					//sets the data
+	return idvar;									//returns our expression now
+}
 
