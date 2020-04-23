@@ -78,17 +78,17 @@ logical isRelOp() {
 
 //Productions
 void systemgoal() {
-	startMain();
 	program();
 	match(SCANEOF);
-	endMain();
 	
 }
 
 void program() {
 	match(BEGIN);
+	startMain();
 	statementList();
 	match(END);
+	endMain();
 }
 
 void statementList() {

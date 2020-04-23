@@ -15,6 +15,7 @@ Language Translations
 #include "scanner.h"
 
 
+
 #define OUTFILE_BUFF_SIZE 2000
 char OutPutBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
 
@@ -88,8 +89,10 @@ logical isInSymbolTable(IdString Id) {
 }
 
 logical registerSymbol(IdString Id) {
+	printf("Inside Registers Symbol\n");
 	logical canregister = isInSymbolTable(Id);
-	if (canregister) {
+	if (!canregister) {
+		printf("Inside CanRegister If statement\n");
 		//Copy new id into the latest symbol slot
 		strcpy(SymbolTable[SymbolCount], Id);
 		SymbolCount++;
@@ -250,15 +253,19 @@ void endMain()
 	printf("Inside endMain\n");
 	printSymbols();
 	copyToFile(OutFile, TmpFile);
-	fputs("}", OutFile);
+	fputc("}", OutFile);
 }
 
 void printSymbols()
 {
+	printf("Inside Print Symbols\n");
+	char printMain[200] = { '\0' };
 	int i = 0;
 	for (i = 0; i < SymbolCount; i++)
 	{
-		fputc(SymbolTable[i], OutFile);
+		printf("Inside Print Symbols Loop\n");
+		sprintf(printMain, "\nint %s", SymbolTable[i]);
+		fputs(printMain, OutFile);
 	}
 }
 

@@ -95,7 +95,7 @@ void copyToFile(FILE* DstFile, FILE* SrcFile)
     while ((currentChar = fgetc(SrcFile)) != EOF)
     {
         fputc(currentChar, DstFile);
-        printf("Looping\n");
+        printf("Inside Copy to Files Loop\n");
     }
 
     rewind(SrcFile);
