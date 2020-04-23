@@ -89,13 +89,11 @@ logical getSameNameSelection()
 
 void copyToFile(FILE* DstFile, FILE* SrcFile)
 {
-    printf("In CopyToFile\n");
     rewind(SrcFile);
     char currentChar;
     while ((currentChar = fgetc(SrcFile)) != EOF)
     {
         fputc(currentChar, DstFile);
-        printf("Inside Copy to Files Loop\n");
     }
 
     rewind(SrcFile);
@@ -267,10 +265,10 @@ logical getOutfile(char* OutFileName, char* InpFileName, logical PromptFile) {
         PromptFile = ltrue;
     } while (askagain == ltrue && aborted == lfalse);
 
-    if (OutFile != NULL)
+    /*if (OutFile != NULL)
     {
         fclose(OutFile);
-    }
+    }*/
 
     return aborted; //indicate whether the user quit or not
 }
@@ -333,11 +331,30 @@ file_outcome openFiles(int argc, char* argv[]) {
                 printf("Listing file   %s\n", lisfilename);
                 printf("Temp file      %s\n", tmpfilename);
 
+                //Ensure we don't re-open already-open files
+                if (InpFile != NULL) {
+                    fclose(InpFile);
+                    InpFile = NULL;
+                }
+                if (OutFile != NULL) {
+                    fclose(OutFile);
+                    OutFile = NULL;
+                }
+                if (LisFile != NULL) {
+                    fclose(LisFile);
+                    LisFile = NULL;
+                }
+                if (TmpFile != NULL) {
+                    fclose(TmpFile);
+                    TmpFile = NULL;
+                }
+                
+
                 //Opens Files
                 fopen_s(&InpFile, inpfilename, "r");
                 fopen_s(&OutFile, outfilename, "w");
                 fopen_s(&LisFile, lisfilename, "w");
-                fopen_s(&TmpFile, tmpfilename, "w");
+                fopen_s(&TmpFile, tmpfilename, "w+");
 
                 fileCheck = cont;
             }

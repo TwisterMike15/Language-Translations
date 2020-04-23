@@ -240,7 +240,7 @@ void factor(ExprRec* ResultExpression) {
 	case MINUSOP:
 		match(MINUSOP);
 		factor(&tempresult);
-		prefixString(tempresult, '-');
+		prefixString(tempresult.data, '-');
 		*ResultExpression = tempresult;
 
 		break;
@@ -363,7 +363,7 @@ void unary(ExprRec* Condition) {
 	case MINUSOP:
 		match(MINUSOP);
 		unary(&expression);
-		prefixString(expression.data, '!');
+		prefixString(expression.data, '-');
 		*Condition = expression;
 
 		break;

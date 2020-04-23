@@ -89,16 +89,16 @@ logical isInSymbolTable(IdString Id) {
 }
 
 logical registerSymbol(IdString Id) {
-	printf("Inside Registers Symbol\n");
-	logical canregister = isInSymbolTable(Id);
-	if (!canregister) {
+	//printf("Id: %s\n",Id);
+	logical alreadyregistered = isInSymbolTable(Id);
+	if (!alreadyregistered) {
 		printf("Inside CanRegister If statement\n");
 		//Copy new id into the latest symbol slot
 		strcpy(SymbolTable[SymbolCount], Id);
 		SymbolCount++;
 	}
 
-	return canregister;
+	return alreadyregistered;
 }
 
 char* registerTemp() {
@@ -106,6 +106,7 @@ char* registerTemp() {
 	static IdString tempid;
 
 	sprintf(tempid, "Temp%d", tempcount);
+	registerSymbol(tempid);
 
 	tempcount++;
 	return tempid;
@@ -114,6 +115,8 @@ char* registerTemp() {
 
 void generate(const char* output) {
 	fprintf(TmpFile, "%s", output);
+	printf("%s",output);
+
 }
 
 
@@ -132,14 +135,7 @@ void prefixString(char* buff, char prefix) {
 
 	//Begin from end, copy every char from previous index
 	for (i = length+1; i > 0; i--) {
-		if (i == length)
-		{
-			buff[i] = '\0';
-		}
-		else
-		{
-			buff[i] = buff[i - 1];
-		}
+		buff[i] = buff[i - 1];
 	}
 	buff[0] = prefix;
 }
@@ -237,7 +233,7 @@ void generateWriteStatement(ExprRec WriteExpression) {
 
 void startMain()
 {
-	char printMain[1000] = { '\0' };
+	char printMain[150] = { '\0' };
 	time_t rawtime;
 	struct tm* timeinfo;
 
@@ -245,26 +241,26 @@ void startMain()
 	timeinfo = localtime(&rawtime);
 	sprintf(printMain, "//Date and Time of Compilation: %s\n", asctime(timeinfo));
 	fputs(printMain, OutFile);
-	fputs("main()\n{\n", OutFile);
+	fputs("#include <stdio.h>\n\n", OutFile);
+	fputs("int main()\n{\n", OutFile);
 }
 
 void endMain()
 {
 	printf("Inside endMain\n");
+
 	printSymbols();
 	copyToFile(OutFile, TmpFile);
-	fputc("}", OutFile);
+	fputs("} //End of Main", OutFile);
 }
 
 void printSymbols()
 {
-	printf("Inside Print Symbols\n");
 	char printMain[200] = { '\0' };
 	int i = 0;
 	for (i = 0; i < SymbolCount; i++)
 	{
-		printf("Inside Print Symbols Loop\n");
-		sprintf(printMain, "\nint %s", SymbolTable[i]);
+		sprintf(printMain, "int %s;\n", SymbolTable[i]);
 		fputs(printMain, OutFile);
 	}
 }

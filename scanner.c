@@ -321,6 +321,7 @@ void parserError(char* expected) {
     printf("\nInside of parseError\n");
 
     sprintf(syntaxErrorBuff[syntaxErrIndex], "Syntax Error on line %2d-   %s recieved   %s expected\n", LineCount, CurrToken.Name, expected);
+    printf(syntaxErrorBuff);
     syntaxErrIndex++;
     syntaxErrTotal++;
 }
