@@ -1,12 +1,28 @@
-#include "generator.h"
-#include "scanner.h"
+/*Group 2 Program 3
+Paul Maclean- mac7537@calu.edu
+Mike Gorse- gor9632@calu.edu
+Robert Breckenridge- bre6896@calu.edu
+Chase Smith- smi8808@calu.edu
+Rudolph Hanzes - han7739@calu.edu
+
+CSC 460
+Language Translations
+*/
 
 //Design discussed with Anthony Carrola
 
+#include "generator.h"
+#include "scanner.h"
+
+
+#define OUTFILE_BUFF_SIZE 2000
+char OutPutBuffer[OUTFILE_BUFF_SIZE] = { '\0' };
 
 
 IdString SymbolTable[100];
 int SymbolCount = 0;
+
+void printSymbols(void);
 
 
 //didn't think about this when implementing the scanner. don't like switch cases and other methods so this works
@@ -52,6 +68,8 @@ static const char* OPERATOR_LOOKUP[34] = {
 OpRec processOp(TokenId OpEnum);
 ExprRec processLiteral(char* TokenContent);
 ExprRec processId(char* TokenContent);
+
+
 
 logical isInSymbolTable(IdString Id) {
 	logical success = lfalse;
@@ -106,12 +124,19 @@ void generate(const char* output) {
 
 
 void prefixString(char* buff, char prefix) {
-	int length = strlen(buff);
+	int length = strlen(buff)+1;
 	int i = 0;
 
 	//Begin from end, copy every char from previous index
-	for (i = length; i > 0; i--) {
-		buff[i] = buff[i - 1];
+	for (i = length+1; i > 0; i--) {
+		if (i == length)
+		{
+			buff[i] = '\0';
+		}
+		else
+		{
+			buff[i] = buff[i - 1];
+		}
 	}
 	buff[0] = prefix;
 }
@@ -161,9 +186,10 @@ ExprRec generateCondition(ExprRec LeftExpr, OpRec Operator, ExprRec RightExpr) {
 
 void generateRead(char* TokenContent) {
 	ExprRec idrec = processId(TokenContent);
+	clearBuffer(OutPutBuffer, OUTFILE_BUFF_SIZE);
 	//**************************************************
-	generate("scanf(\"%%d\", &%s);\n");
-	generate(idrec.data);
+	sprintf(OutPutBuffer, "scanf(\"%%d\", &%s);\n", TokenContent);
+	fputs(OutPutBuffer, TmpFile);
 }
 
 ExprRec generateInfix(ExprRec LeftOp, OpRec OpInf, ExprRec RightOp)		//generates expressions
@@ -201,12 +227,40 @@ void generateAssignment(ExprRec Target, ExprRec Source) {
 }
 
 void generateWriteStatement(ExprRec WriteExpression) {
-	generate("printf( ");
+	generate("printf(\"%d\", ");
 	generate(WriteExpression.data);
 	generate(" );\n");
 }
 
+void startMain()
+{
+	char printMain[1000] = { '\0' };
+	time_t rawtime;
+	struct tm* timeinfo;
 
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	sprintf(printMain, "//Date and Time of Compilation: %s\n", asctime(timeinfo));
+	fputs(printMain, OutFile);
+	fputs("main()\n{\n", OutFile);
+}
+
+void endMain()
+{
+	printf("Inside endMain\n");
+	printSymbols();
+	copyToFile(OutFile, TmpFile);
+	fputs("}", OutFile);
+}
+
+void printSymbols()
+{
+	int i = 0;
+	for (i = 0; i < SymbolCount; i++)
+	{
+		fputc(SymbolTable[i], OutFile);
+	}
+}
 
 
 

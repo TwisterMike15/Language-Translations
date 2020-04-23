@@ -33,5 +33,9 @@ void generateIfStatement(ExprRec Condition);
 ExprRec generateCondition(ExprRec LeftExpr, OpRec Operator, ExprRec RightExpr);
 ExprRec generateInfix(ExprRec LeftOp, OpRec OpInf, ExprRec RightOp);
 
+void generate(const char* output);
+void startMain(void);
+void endMain(void);
+
 
 #endif

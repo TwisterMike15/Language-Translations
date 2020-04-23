@@ -117,5 +117,6 @@ void initScanner();
 void printLexErrors();
 void endOfPrinting();
 void printSyntaxErr(void);
+void clearBuffer(char*, int);
 
 #endif

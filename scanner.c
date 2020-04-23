@@ -329,7 +329,7 @@ void printSyntaxErr() {
 
     int i = 0;
 
-    printf("\nInside of PrintSyntaxErr\n");
+   // printf("\nInside of PrintSyntaxErr\n");
 
     //Print each lex error
     for (i = 0; i < syntaxErrIndex; i++)
@@ -370,19 +370,19 @@ void printNumOfErrors()
 logical match(TokenId desiredid) {
     logical success = lfalse;
 
-    clearBuffer(outFileBuffer, OUTFILE_BUFF_SIZE);
-    sprintf(outFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid], CurrToken.Buff);
-    fputs(outFileBuffer, OutFile);
+    //clearBuffer(outFileBuffer, OUTFILE_BUFF_SIZE);
+    //sprintf(outFileBuffer, "Expected Token: %-12s Actual Token: %-15s\n", TOKEN_NAMES[desiredid], CurrToken.Buff);
+    //fputs(outFileBuffer, OutFile);
 
-    strcat(outFileStatementBuffer, CurrToken.Buff);
-    if (CurrToken.Id == SEMICOLON || endOfLine == ltrue || CurrToken.Id == SCANEOF)
-    {
-        strcat(outFileStatementBuffer, "\n\n");
-        fputs(outFileStatementBuffer, OutFile);
-        clearBuffer(outFileStatementBuffer, OUTFILE_BUFF_SIZE);
-        sprintf(outFileStatementBuffer, "\nStatement: ");
-        endOfLine = lfalse;
-    }
+    //strcat(outFileStatementBuffer, CurrToken.Buff);
+    //if (CurrToken.Id == SEMICOLON || endOfLine == ltrue || CurrToken.Id == SCANEOF)
+    //{
+        //strcat(outFileStatementBuffer, "\n\n");
+        //fputs(outFileStatementBuffer, OutFile);
+        //clearBuffer(outFileStatementBuffer, OUTFILE_BUFF_SIZE);
+        //sprintf(outFileStatementBuffer, "\nStatement: ");
+      //  endOfLine = lfalse;
+   // }
 
     if (CurrToken.Id == desiredid) {
         success = ltrue;
@@ -421,7 +421,7 @@ void endOfPrinting()
 
 void initScanner()
 {
-    strcat(outFileStatementBuffer, "\nStatement: "); //Janky, I know. Don't judge me too hard. Here for formatting
+    //strcat(outFileStatementBuffer, "\nStatement: "); //Janky, I know. Don't judge me too hard. Here for formatting
     getNextToken(); //put first token into NextToken
     getNextToken(); //put first token into CurrToken, and second token into NextToken
 }

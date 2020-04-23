@@ -89,10 +89,14 @@ logical getSameNameSelection()
 
 void copyToFile(FILE* DstFile, FILE* SrcFile)
 {
-    char currentChar;
+    printf("In CopyToFile\n");
     rewind(SrcFile);
+    char currentChar;
     while ((currentChar = fgetc(SrcFile)) != EOF)
+    {
         fputc(currentChar, DstFile);
+        printf("Looping\n");
+    }
 
     rewind(SrcFile);
 }
